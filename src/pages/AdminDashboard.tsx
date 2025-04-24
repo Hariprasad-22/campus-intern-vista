@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,15 +31,48 @@ const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Filter states
-  const [branch, setBranch] = useState("All Branches");
-  const [year, setYear] = useState("All Years");
-  const [course, setCourse] = useState("All Courses");
-  const [company, setCompany] = useState("All Companies");
-  const [status, setStatus] = useState("All Status");
-  const [searchQuery, setSearchQuery] = useState("");
+  if (!user || user.role !== "admin") {
+    navigate("/login");
+    return null;
+  }
 
-  // For CSV export
+  const [filters, setFilters] = useState({
+    rollNumber: "",
+    studentName: "",
+    branch: "All Branches",
+    year: "All Years",
+    course: "All Courses",
+    company: "All Companies",
+    role: "",
+    duration: "",
+    status: "All Status",
+  });
+
+  const filterApplications = () => {
+    return applications.filter((application) => {
+      return (
+        (filters.rollNumber === "" || 
+          application.studentInfo.rollNumber.toLowerCase().includes(filters.rollNumber.toLowerCase())) &&
+        (filters.studentName === "" || 
+          application.studentInfo.email.toLowerCase().includes(filters.studentName.toLowerCase())) &&
+        (filters.branch === "All Branches" || 
+          application.studentInfo.branch === filters.branch) &&
+        (filters.year === "All Years" || 
+          application.studentInfo.year === filters.year) &&
+        (filters.course === "All Courses" || 
+          application.studentInfo.course === filters.course) &&
+        (filters.company === "All Companies" || 
+          application.companyInfo.companyName === filters.company) &&
+        (filters.role === "" || 
+          application.companyInfo.roleOffered.toLowerCase().includes(filters.role.toLowerCase())) &&
+        (filters.duration === "" || 
+          application.companyInfo.duration === filters.duration) &&
+        (filters.status === "All Status" || 
+          application.status === filters.status.toLowerCase())
+      );
+    });
+  };
+
   const exportToCSV = (type: "applications" | "feedback") => {
     let data: string[][];
     let filename: string;
@@ -102,225 +134,120 @@ const AdminDashboard: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  // Filter applications based on selected filters
-  const filterApplications = (): InternshipApplication[] => {
-    return applications.filter((application) => {
-      // Branch filter
-      if (branch !== "All Branches" && application.studentInfo.branch !== branch)
-        return false;
-
-      // Year filter
-      if (year !== "All Years" && application.studentInfo.year !== year)
-        return false;
-
-      // Course filter
-      if (course !== "All Courses" && application.studentInfo.course !== course)
-        return false;
-
-      // Company filter
-      if (
-        company !== "All Companies" &&
-        application.companyInfo.companyName !== company
-      )
-        return false;
-
-      // Status filter
-      if (status !== "All Status" && application.status !== status.toLowerCase())
-        return false;
-
-      // Search query
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        return (
-          application.studentInfo.rollNumber.toLowerCase().includes(query) ||
-          application.studentInfo.email.toLowerCase().includes(query) ||
-          application.companyInfo.companyName.toLowerCase().includes(query) ||
-          application.companyInfo.roleOffered.toLowerCase().includes(query)
-        );
-      }
-
-      return true;
-    });
-  };
-
-  // Ensure user is admin
-  if (!user || user.role !== "admin") {
-    navigate("/login");
-    return null;
-  }
-
-  const filteredApplications = filterApplications();
-
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-background">
       <Header />
       <div className="container mx-auto py-8">
         <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
 
-        <Tabs defaultValue="applications">
-          <TabsList className="mb-6">
+        <Tabs defaultValue="applications" className="space-y-6">
+          <TabsList>
             <TabsTrigger value="applications">Applications</TabsTrigger>
             <TabsTrigger value="feedback">Feedback</TabsTrigger>
           </TabsList>
 
           <TabsContent value="applications">
-            <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
-              <h2 className="text-xl font-semibold mb-4">
-                Internship Applications
-              </h2>
-              <p className="text-gray-600 mb-6">
-                View and manage student internship applications
-              </p>
-
-              {/* Filters */}
-              <div className="mb-6">
-                <h3 className="text-lg font-medium mb-2">Filters</h3>
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
-                  <div>
-                    <label className="text-sm font-medium">Branch</label>
-                    <Select
-                      value={branch}
-                      onValueChange={(value) => setBranch(value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="All Branches" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="All Branches">All Branches</SelectItem>
-                        {branches.map((b) => (
-                          <SelectItem key={b} value={b}>
-                            {b}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium">Year</label>
-                    <Select
-                      value={year}
-                      onValueChange={(value) => setYear(value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="All Years" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="All Years">All Years</SelectItem>
-                        {[1, 2, 3, 4, 5].map((y) => (
-                          <SelectItem key={y} value={y.toString()}>
-                            {y}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium">Course</label>
-                    <Select
-                      value={course}
-                      onValueChange={(value) => setCourse(value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="All Courses" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="All Courses">All Courses</SelectItem>
-                        {courses.map((c) => (
-                          <SelectItem key={c} value={c}>
-                            {c}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium">Company</label>
-                    <Select
-                      value={company}
-                      onValueChange={(value) => setCompany(value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="All Companies" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="All Companies">All Companies</SelectItem>
-                        {companies.map((c) => (
-                          <SelectItem key={c} value={c}>
-                            {c}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium">Status</label>
-                    <Select
-                      value={status}
-                      onValueChange={(value) => setStatus(value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="All Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="All Status">All Status</SelectItem>
-                        <SelectItem value="Pending">Pending</SelectItem>
-                        <SelectItem value="Approved">Approved</SelectItem>
-                        <SelectItem value="Rejected">Rejected</SelectItem>
-                        <SelectItem value="Completed">Completed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+            <div className="bg-card p-6 rounded-lg shadow-sm space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Roll Number</label>
+                  <Input
+                    placeholder="Filter by roll number"
+                    value={filters.rollNumber}
+                    onChange={(e) => setFilters({ ...filters, rollNumber: e.target.value })}
+                  />
                 </div>
-
-                <div className="flex flex-col md:flex-row justify-between gap-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-                    <Input
-                      placeholder="Search by roll number, name, company..."
-                      className="pl-8"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setBranch("All Branches");
-                        setYear("All Years");
-                        setCourse("All Courses");
-                        setCompany("All Companies");
-                        setStatus("All Status");
-                        setSearchQuery("");
-                      }}
-                    >
-                      Reset
-                    </Button>
-                    <Button>
-                      <Filter className="h-4 w-4 mr-2" />
-                      Apply Filters
-                    </Button>
-                  </div>
+                <div>
+                  <label className="text-sm font-medium">Student Name</label>
+                  <Input
+                    placeholder="Filter by student name"
+                    value={filters.studentName}
+                    onChange={(e) => setFilters({ ...filters, studentName: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Branch</label>
+                  <Select
+                    value={filters.branch}
+                    onValueChange={(value) => setFilters({ ...filters, branch: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Branches" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="All Branches">All Branches</SelectItem>
+                      {branches.map((branch) => (
+                        <SelectItem key={branch} value={branch}>
+                          {branch}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Year</label>
+                  <Select
+                    value={filters.year}
+                    onValueChange={(value) => setFilters({ ...filters, year: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Years" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="All Years">All Years</SelectItem>
+                      {[1, 2, 3, 4, 5].map((year) => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Role</label>
+                  <Input
+                    placeholder="Filter by role"
+                    value={filters.role}
+                    onChange={(e) => setFilters({ ...filters, role: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Duration (months)</label>
+                  <Input
+                    placeholder="Filter by duration"
+                    value={filters.duration}
+                    onChange={(e) => setFilters({ ...filters, duration: e.target.value })}
+                  />
                 </div>
               </div>
 
-              {/* Applications Table */}
+              <div className="flex justify-between items-center">
+                <Button
+                  variant="outline"
+                  onClick={() => setFilters({
+                    rollNumber: "",
+                    studentName: "",
+                    branch: "All Branches",
+                    year: "All Years",
+                    course: "All Courses",
+                    company: "All Companies",
+                    role: "",
+                    duration: "",
+                    status: "All Status",
+                  })}
+                >
+                  Reset Filters
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => exportToCSV("applications")}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export to CSV
+                </Button>
+              </div>
+
               <div className="overflow-x-auto">
-                <div className="flex justify-end mb-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => exportToCSV("applications")}
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Export to CSV
-                  </Button>
-                </div>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -328,60 +255,47 @@ const AdminDashboard: React.FC = () => {
                       <TableHead>Student Name</TableHead>
                       <TableHead>Branch</TableHead>
                       <TableHead>Year</TableHead>
+                      <TableHead>Mobile</TableHead>
                       <TableHead>Company</TableHead>
                       <TableHead>Role</TableHead>
                       <TableHead>Duration</TableHead>
+                      <TableHead>Stipend</TableHead>
                       <TableHead>Start Date</TableHead>
                       <TableHead>Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredApplications.length > 0 ? (
-                      filteredApplications.map((application) => (
-                        <TableRow key={application.id}>
-                          <TableCell>
-                            {application.studentInfo.rollNumber}
-                          </TableCell>
-                          <TableCell>
-                            {application.studentInfo.email.split("@")[0]}
-                          </TableCell>
-                          <TableCell>{application.studentInfo.branch}</TableCell>
-                          <TableCell>{application.studentInfo.year}</TableCell>
-                          <TableCell>
-                            {application.companyInfo.companyName}
-                          </TableCell>
-                          <TableCell>
-                            {application.companyInfo.roleOffered}
-                          </TableCell>
-                          <TableCell>{application.companyInfo.duration} months</TableCell>
-                          <TableCell>
-                            {format(new Date(application.internshipDuration.startDate!), "MMM dd, yyyy")}
-                          </TableCell>
-                          <TableCell>
-                            <Badge
-                              className={`${
-                                application.status === "approved"
-                                  ? "bg-green-500"
-                                  : application.status === "rejected"
-                                  ? "bg-red-500"
-                                  : application.status === "completed"
-                                  ? "bg-blue-500"
-                                  : "bg-yellow-500"
-                              }`}
-                            >
-                              {application.status.charAt(0).toUpperCase() +
-                                application.status.slice(1)}
-                            </Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={9} className="text-center py-4">
-                          No internship applications found.
+                    {filterApplications().map((application) => (
+                      <TableRow key={application.id}>
+                        <TableCell>{application.studentInfo.rollNumber}</TableCell>
+                        <TableCell>{application.studentInfo.email.split("@")[0]}</TableCell>
+                        <TableCell>{application.studentInfo.branch}</TableCell>
+                        <TableCell>{application.studentInfo.year}</TableCell>
+                        <TableCell>{application.studentInfo.mobileNumber}</TableCell>
+                        <TableCell>{application.companyInfo.companyName}</TableCell>
+                        <TableCell>{application.companyInfo.roleOffered}</TableCell>
+                        <TableCell>{application.companyInfo.duration} months</TableCell>
+                        <TableCell>₹{application.companyInfo.stipend}</TableCell>
+                        <TableCell>
+                          {format(new Date(application.internshipDuration.startDate!), "MMM dd, yyyy")}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            className={`${
+                              application.status === "approved"
+                                ? "bg-green-500"
+                                : application.status === "rejected"
+                                ? "bg-red-500"
+                                : application.status === "completed"
+                                ? "bg-blue-500"
+                                : "bg-yellow-500"
+                            }`}
+                          >
+                            {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
+                          </Badge>
                         </TableCell>
                       </TableRow>
-                    )}
+                    ))}
                   </TableBody>
                 </Table>
               </div>
