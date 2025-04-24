@@ -6,6 +6,7 @@ import { z } from "zod";
 import { StudentInfo } from "@/types";
 import { branches, courses } from "@/data/mockData";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
