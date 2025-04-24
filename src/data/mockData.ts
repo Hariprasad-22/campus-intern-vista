@@ -1,0 +1,116 @@
+
+import { InternshipApplication, User, FeedbackForm } from "../types";
+
+export const users: User[] = [
+  {
+    id: "1",
+    email: "student@college.edu",
+    role: "student",
+    name: "John Student",
+  },
+  {
+    id: "2",
+    email: "admin@college.edu",
+    role: "admin",
+    name: "Admin User",
+  },
+];
+
+export const companies = [
+  "Google",
+  "Microsoft",
+  "Amazon",
+  "Apple",
+  "Meta",
+  "Netflix",
+  "Tesla",
+  "IBM",
+  "Oracle",
+  "Intel",
+  "Adobe",
+  "Cisco",
+  "Salesforce",
+  "Twitter",
+  "Uber",
+  "Airbnb",
+  "LinkedIn",
+  "PayPal",
+  "eBay",
+  "Spotify",
+];
+
+export const branches = [
+  "Computer Science",
+  "Information Technology",
+  "Electronics and Communication",
+  "Electrical Engineering",
+  "Mechanical Engineering",
+  "Civil Engineering",
+  "Chemical Engineering",
+  "Biotechnology",
+];
+
+export const courses = [
+  "B.Tech",
+  "M.Tech",
+  "BCA",
+  "MCA",
+  "B.Sc",
+  "M.Sc",
+  "BBA",
+  "MBA",
+];
+
+const mockApplications: InternshipApplication[] = [
+  {
+    id: "app1",
+    studentId: "1",
+    studentInfo: {
+      rollNumber: "CS20B1001",
+      course: "B.Tech",
+      branch: "Computer Science",
+      year: "3",
+      semester: "5",
+      email: "student@college.edu",
+      mobileNumber: "9876543210",
+      academicYear: "2023-24",
+    },
+    companyInfo: {
+      companyName: "Google",
+      roleOffered: "Software Engineer Intern",
+      stipend: "50000",
+      duration: "3",
+      hrName: "Jane Doe",
+      hrMobile: "9876543211",
+      hrEmail: "jane@google.com",
+    },
+    internshipDuration: {
+      startDate: new Date("2023-05-15"),
+      endDate: new Date("2023-08-15"),
+    },
+    documents: {},
+    createdAt: new Date("2023-04-10"),
+    status: "completed",
+  },
+];
+
+export const applications: InternshipApplication[] = mockApplications;
+
+export const feedbacks: FeedbackForm[] = [
+  {
+    id: "feed1",
+    applicationId: "app1",
+    studentId: "1",
+    rating: 4,
+    experience: "It was a great learning experience working with professionals.",
+    skills: "React, TypeScript, Node.js",
+    suggestions: "More focus on real-world projects would be helpful.",
+    createdAt: new Date("2023-08-20"),
+  },
+];
+
+// Helper function to simulate user authentication
+export const authenticate = (email: string, password: string): User | null => {
+  if (password !== "password123") return null;
+  return users.find(user => user.email === email) || null;
+};
