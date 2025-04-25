@@ -9,6 +9,7 @@ export interface User {
 }
 
 export interface StudentInfo {
+  fullName: string;  // Added fullName field
   rollNumber: string;
   course: string;
   branch: string;

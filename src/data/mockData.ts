@@ -1,4 +1,3 @@
-
 import { InternshipApplication, User, FeedbackForm } from "../types";
 
 export const users: User[] = [
@@ -17,6 +16,7 @@ export const users: User[] = [
 ];
 
 export const companies = [
+  "",
   "Google",
   "Microsoft",
   "Amazon",
@@ -52,13 +52,7 @@ export const branches = [
 
 export const courses = [
   "B.Tech",
-  "M.Tech",
-  "BCA",
-  "MCA",
-  "B.Sc",
-  "M.Sc",
-  "BBA",
-  "MBA",
+  "M.Tech"
 ];
 
 const mockApplications: InternshipApplication[] = [

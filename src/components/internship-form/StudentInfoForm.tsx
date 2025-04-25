@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,8 +21,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { User } from "lucide-react";
 
 const studentInfoSchema = z.object({
+  fullName: z.string().min(1, "Full name is required"),
   rollNumber: z.string().min(1, "Roll number is required"),
   course: z.string().min(1, "Course is required"),
   branch: z.string().min(1, "Branch is required"),
@@ -48,6 +49,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
   const form = useForm<StudentInfo>({
     resolver: zodResolver(studentInfoSchema),
     defaultValues: {
+      fullName: defaultValues?.fullName || "",
       rollNumber: defaultValues?.rollNumber || "",
       course: defaultValues?.course || "",
       branch: defaultValues?.branch || "",
@@ -70,6 +72,23 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
         className="space-y-6 max-w-2xl mx-auto"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="fullName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Full Name</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Input placeholder="John Doe" {...field} />
+                    <User className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="rollNumber"
@@ -96,7 +115,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="e.g. B.Tech" />
+                      <SelectValue placeholder="Select course" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -124,7 +143,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="e.g. Computer Science" />
+                      <SelectValue placeholder="Select branch" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -152,7 +171,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="e.g. 3" />
+                      <SelectValue placeholder="Select year" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -180,11 +199,11 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="e.g. 5" />
+                      <SelectValue placeholder="Select semester" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((semester) => (
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((semester) => (
                       <SelectItem key={semester} value={semester.toString()}>
                         {semester}
                       </SelectItem>
