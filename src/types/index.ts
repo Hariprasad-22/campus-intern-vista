@@ -1,3 +1,4 @@
+
 export type UserRole = "student" | "admin";
 
 export interface User {
@@ -62,5 +63,8 @@ export interface FeedbackForm {
   role: string;
   rating: number;
   feedback: string;
+  experience: string;
+  skills: string;
+  suggestions?: string;
   createdAt: Date;
 }
