@@ -1,3 +1,4 @@
+
 import { InternshipApplication, User, FeedbackForm } from "../types";
 
 export const users: User[] = [
@@ -60,6 +61,7 @@ const mockApplications: InternshipApplication[] = [
     id: "app1",
     studentId: "1",
     studentInfo: {
+      fullName: "John Student", // Added the fullName property
       rollNumber: "CS20B1001",
       course: "B.Tech",
       branch: "Computer Science",
@@ -95,7 +97,14 @@ export const feedbacks: FeedbackForm[] = [
     id: "feed1",
     applicationId: "app1",
     studentId: "1",
+    studentName: "John Student",
+    mobileNumber: "9876543210",
+    rollNumber: "CS20B1001",
+    academicYear: "2023-24",
+    companyName: "Google",
+    role: "Software Engineer Intern",
     rating: 4,
+    feedback: "The internship was very educational and helped me grow professionally.",
     experience: "It was a great learning experience working with professionals.",
     skills: "React, TypeScript, Node.js",
     suggestions: "More focus on real-world projects would be helpful.",

@@ -32,6 +32,10 @@ const feedbackSchema = z.object({
   feedback: z.string()
     .min(10, "Please provide more details about your experience")
     .max(200, "Feedback should not exceed 200 words"),
+  experience: z.string()
+    .min(10, "Please provide details about your experience")
+    .default(""),
+  skills: z.string().min(1, "Please list skills you gained").default(""),
 });
 
 type FeedbackFormProps = {
@@ -54,6 +58,8 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName,
       academicYear: "",
       rating: 3,
       feedback: "",
+      experience: "",
+      skills: "",
     },
   });
 
@@ -72,6 +78,8 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName,
       role,
       rating: data.rating,
       feedback: data.feedback,
+      experience: data.experience,
+      skills: data.skills,
       createdAt: new Date(),
     };
 
@@ -211,6 +219,51 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName,
                     </FormControl>
                     <FormDescription>
                       Provide detailed feedback about your internship experience
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="col-span-2">
+              <FormField
+                control={form.control}
+                name="skills"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Skills Gained</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g. React, TypeScript, Project Management"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      List the skills you gained during your internship
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="col-span-2">
+              <FormField
+                control={form.control}
+                name="experience"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Learning Experience</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Describe what you learned during your internship..."
+                        className="min-h-[120px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Share your learning experience and key takeaways
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
