@@ -1,3 +1,4 @@
+
 import { InternshipApplication, User, FeedbackForm } from "../types";
 
 export const users: User[] = [
@@ -83,7 +84,11 @@ const mockApplications: InternshipApplication[] = [
       startDate: new Date("2023-05-15"),
       endDate: new Date("2023-08-15"),
     },
-    documents: {},
+    documents: {
+      offerLetter: null,
+      nocByHod: null,
+      studentLetterToHod: null
+    },
     createdAt: new Date("2023-04-10"),
     status: "completed",
   },
