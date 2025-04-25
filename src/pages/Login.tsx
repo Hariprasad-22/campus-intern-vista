@@ -1,6 +1,6 @@
 
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -25,6 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { UserRole } from "@/types";
 
 const loginSchema = z.object({
   email: z
@@ -41,7 +42,15 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
+  const role = searchParams.get("role") as UserRole;
+
+  useEffect(() => {
+    if (!role) {
+      navigate("/");
+    }
+  }, [role, navigate]);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -57,6 +66,10 @@ const Login = () => {
       const success = await login(data.email, data.password);
       if (success) {
         const isAdmin = data.email === "admin@college.edu";
+        if ((role === "admin" && !isAdmin) || (role === "student" && isAdmin)) {
+          toast.error("Invalid credentials for selected role");
+          return;
+        }
         toast.success("Login successful");
         navigate(isAdmin ? "/admin" : "/dashboard");
       } else {
@@ -69,11 +82,15 @@ const Login = () => {
     }
   };
 
+  if (!role) return null;
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <Card className="w-[400px]">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Login</CardTitle>
+          <CardTitle className="text-2xl text-center">
+            {role === "admin" ? "Admin Login" : "Student Login"}
+          </CardTitle>
           <CardDescription className="text-center">
             Enter your college email to access the internship portal
           </CardDescription>
