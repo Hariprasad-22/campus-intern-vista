@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,7 +18,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Slider } from "@/components/ui/slider";
 import { feedbacks } from "@/data/mockData";
 import { v4 as uuidv4 } from "uuid";
 
@@ -28,7 +26,6 @@ const feedbackSchema = z.object({
   mobileNumber: z.string().min(10, "Enter a valid mobile number"),
   rollNumber: z.string().min(1, "Roll number is required"),
   academicYear: z.string().min(1, "Academic year is required"),
-  rating: z.number().min(1).max(5),
   feedback: z.string()
     .min(10, "Please provide more details about your experience")
     .max(200, "Feedback should not exceed 200 words"),
@@ -45,7 +42,6 @@ type FeedbackFormProps = {
 };
 
 const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName, role }) => {
-  const [rating, setRating] = useState(3);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -56,7 +52,6 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName,
       mobileNumber: "",
       rollNumber: "",
       academicYear: "",
-      rating: 3,
       feedback: "",
       experience: "",
       skills: "",
@@ -76,7 +71,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName,
       academicYear: data.academicYear,
       companyName,
       role,
-      rating: data.rating,
+      rating: 0, // Default to 0 since rating is no longer user-selectable
       feedback: data.feedback,
       experience: data.experience,
       skills: data.skills,
@@ -170,37 +165,6 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName,
                   <p className="text-sm text-gray-600">{role}</p>
                 </div>
               </div>
-            </div>
-
-            <div className="col-span-2">
-              <FormField
-                control={form.control}
-                name="rating"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Overall Rating</FormLabel>
-                    <div className="flex items-center space-x-2">
-                      <span className="w-8 text-center">1</span>
-                      <FormControl>
-                        <Slider
-                          defaultValue={[rating]}
-                          min={1}
-                          max={5}
-                          step={1}
-                          onValueChange={(value) => {
-                            setRating(value[0]);
-                            field.onChange(value[0]);
-                          }}
-                          className="max-w-sm"
-                        />
-                      </FormControl>
-                      <span className="w-8 text-center">5</span>
-                    </div>
-                    <FormDescription>Rate your internship experience (1-5)</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
 
             <div className="col-span-2">
