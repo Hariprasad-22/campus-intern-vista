@@ -34,16 +34,14 @@ const FeedbackPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="container mx-auto py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-2">Internship Feedback</h1>
-          <p className="text-muted-foreground">
-            Please share your experience about your internship at {application.companyInfo.companyName}
-          </p>
-        </div>
-        <FeedbackForm applicationId={application.id} />
+        <FeedbackForm 
+          applicationId={application.id}
+          companyName={application.companyInfo.companyName}
+          role={application.companyInfo.roleOffered}
+        />
       </div>
     </div>
   );

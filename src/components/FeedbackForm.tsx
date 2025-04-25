@@ -24,17 +24,23 @@ import { feedbacks } from "@/data/mockData";
 import { v4 as uuidv4 } from "uuid";
 
 const feedbackSchema = z.object({
+  studentName: z.string().min(1, "Name is required"),
+  mobileNumber: z.string().min(10, "Enter a valid mobile number"),
+  rollNumber: z.string().min(1, "Roll number is required"),
+  academicYear: z.string().min(1, "Academic year is required"),
   rating: z.number().min(1).max(5),
-  experience: z.string().min(10, "Please provide more details about your experience"),
-  skills: z.string().min(3, "Please list at least one skill learned"),
-  suggestions: z.string().optional(),
+  feedback: z.string()
+    .min(10, "Please provide more details about your experience")
+    .max(200, "Feedback should not exceed 200 words"),
 });
 
 type FeedbackFormProps = {
   applicationId: string;
+  companyName: string;
+  role: string;
 };
 
-const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId }) => {
+const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName, role }) => {
   const [rating, setRating] = useState(3);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -42,10 +48,12 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId }) => {
   const form = useForm<z.infer<typeof feedbackSchema>>({
     resolver: zodResolver(feedbackSchema),
     defaultValues: {
+      studentName: "",
+      mobileNumber: "",
+      rollNumber: "",
+      academicYear: "",
       rating: 3,
-      experience: "",
-      skills: "",
-      suggestions: "",
+      feedback: "",
     },
   });
 
@@ -56,10 +64,14 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId }) => {
       id: uuidv4(),
       applicationId,
       studentId: user.id,
+      studentName: data.studentName,
+      mobileNumber: data.mobileNumber,
+      rollNumber: data.rollNumber,
+      academicYear: data.academicYear,
+      companyName,
+      role,
       rating: data.rating,
-      experience: data.experience,
-      skills: data.skills,
-      suggestions: data.suggestions || "",
+      feedback: data.feedback,
       createdAt: new Date(),
     };
 
@@ -73,98 +85,139 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId }) => {
   return (
     <div className="p-6 bg-white rounded-md shadow-sm max-w-4xl mx-auto">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold">Feedback Form</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Internship Feedback</h1>
+        <p className="text-gray-600 mt-2">
+          Your feedback is valuable for future interns at {companyName}
+        </p>
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <FormField
-            control={form.control}
-            name="rating"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Overall Rating</FormLabel>
-                <div className="flex items-center space-x-2">
-                  <span className="w-8 text-center">1</span>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              control={form.control}
+              name="studentName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
                   <FormControl>
-                    <Slider
-                      defaultValue={[rating]}
-                      min={1}
-                      max={5}
-                      step={1}
-                      onValueChange={(value) => {
-                        setRating(value[0]);
-                        field.onChange(value[0]);
-                      }}
-                      className="max-w-sm"
-                    />
+                    <Input placeholder="Enter your full name" {...field} />
                   </FormControl>
-                  <span className="w-8 text-center">5</span>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="mobileNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mobile Number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter your mobile number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="rollNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Roll Number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter your roll number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="academicYear"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Academic Year</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. 2023-24" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="col-span-2">
+              <p className="text-sm font-medium mb-1">Company Details</p>
+              <div className="grid grid-cols-2 gap-4 p-3 bg-gray-50 rounded-md">
+                <div>
+                  <p className="text-sm font-medium">Company</p>
+                  <p className="text-sm text-gray-600">{companyName}</p>
                 </div>
-                <FormDescription>
-                  Rate your internship experience (1-5)
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                <div>
+                  <p className="text-sm font-medium">Role</p>
+                  <p className="text-sm text-gray-600">{role}</p>
+                </div>
+              </div>
+            </div>
 
-          <FormField
-            control={form.control}
-            name="experience"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Describe your experience</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Please share your internship experience..."
-                    className="min-h-[120px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <div className="col-span-2">
+              <FormField
+                control={form.control}
+                name="rating"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Overall Rating</FormLabel>
+                    <div className="flex items-center space-x-2">
+                      <span className="w-8 text-center">1</span>
+                      <FormControl>
+                        <Slider
+                          defaultValue={[rating]}
+                          min={1}
+                          max={5}
+                          step={1}
+                          onValueChange={(value) => {
+                            setRating(value[0]);
+                            field.onChange(value[0]);
+                          }}
+                          className="max-w-sm"
+                        />
+                      </FormControl>
+                      <span className="w-8 text-center">5</span>
+                    </div>
+                    <FormDescription>Rate your internship experience (1-5)</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-          <FormField
-            control={form.control}
-            name="skills"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Skills Learned</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="e.g. React, TypeScript, Node.js"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  List the key skills you gained during the internship
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="suggestions"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Suggestions for Improvement</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Any suggestions to improve the internship program..."
-                    className="min-h-[100px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>Optional</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <div className="col-span-2">
+              <FormField
+                control={form.control}
+                name="feedback"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Feedback</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Share your internship experience (maximum 200 words)..."
+                        className="min-h-[120px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Provide detailed feedback about your internship experience
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
 
           <Button type="submit" className="w-full">
             Submit Feedback
