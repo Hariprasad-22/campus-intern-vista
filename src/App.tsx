@@ -13,6 +13,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import NewApplication from "./pages/NewApplication";
 import FeedbackPage from "./pages/FeedbackPage";
 import Profile from "./pages/Profile";
+import DocumentView from "./pages/DocumentView";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -61,6 +62,16 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["admin"]}>
                   <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Document viewer route */}
+            <Route
+              path="/document/view/:id/:docType"
+              element={
+                <ProtectedRoute>
+                  <DocumentView />
                 </ProtectedRoute>
               }
             />
