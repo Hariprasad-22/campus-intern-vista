@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,15 +13,15 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const { user } = useAuth();
-  const [selectedRole, setSelectedRole] = useState<"student" | "admin" | null>(null);
+  const navigate = useNavigate();
 
   if (user) {
-    return <Navigate to={user.role === "admin" ? "/admin" : "/dashboard"} replace />;
+    return <Navigate to={user.role === "admin" ? "/admin" : "/dashboard"} />;
   }
 
-  if (selectedRole) {
-    return <Navigate to={`/login?role=${selectedRole}`} />;
-  }
+  const handleRoleSelect = (role: "student" | "admin") => {
+    navigate(`/login?role=${role}`);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -34,14 +34,14 @@ const Index = () => {
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <Button
-            onClick={() => setSelectedRole("student")}
+            onClick={() => handleRoleSelect("student")}
             className="w-full"
             size="lg"
           >
             Login as Student
           </Button>
           <Button
-            onClick={() => setSelectedRole("admin")}
+            onClick={() => handleRoleSelect("admin")}
             variant="outline"
             className="w-full"
             size="lg"

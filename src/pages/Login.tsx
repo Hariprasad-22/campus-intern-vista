@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, useSearchParams, Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -46,11 +46,10 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const role = searchParams.get("role") as UserRole;
 
-  useEffect(() => {
-    if (!role) {
-      navigate("/");
-    }
-  }, [role, navigate]);
+  // If no role is specified, redirect to home page
+  if (!role) {
+    return <Navigate to="/" />;
+  }
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -68,6 +67,7 @@ const Login = () => {
         const isAdmin = data.email === "admin@college.edu";
         if ((role === "admin" && !isAdmin) || (role === "student" && isAdmin)) {
           toast.error("Invalid credentials for selected role");
+          setIsLoading(false);
           return;
         }
         toast.success("Login successful");
@@ -81,8 +81,6 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-
-  if (!role) return null;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
