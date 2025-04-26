@@ -9,7 +9,7 @@ import Header from "@/components/Header";
 import ApplicationFilters from "@/components/admin/ApplicationFilters";
 import ApplicationsTable from "@/components/admin/ApplicationsTable";
 import FeedbackTable from "@/components/admin/FeedbackTable";
-import { exportToCSV } from "@/utils/csvExport";
+import { exportToCSV, getDocumentLink } from "@/utils/csvExport";
 import { InternshipApplication, FeedbackForm } from "@/types";
 
 const AdminDashboard: React.FC = () => {
@@ -110,11 +110,24 @@ const AdminDashboard: React.FC = () => {
         if (columnVisibility.duration) rowData.push(`${app.companyInfo.duration} months`);
         if (columnVisibility.stipend) rowData.push(`₹${app.companyInfo.stipend}`);
         if (columnVisibility.internshipYear) rowData.push(app.companyInfo.internshipYear);
-        if (columnVisibility.startDate) rowData.push(format(new Date(app.internshipDuration.startDate!), "yyyy-MM-dd"));
+        if (columnVisibility.startDate) rowData.push(app.internshipDuration.startDate ? format(new Date(app.internshipDuration.startDate), "yyyy-MM-dd") : "Not set");
         if (columnVisibility.status) rowData.push(app.status);
-        if (columnVisibility.offerLetter) rowData.push(app.documents.offerLetter ? "Uploaded" : "Not uploaded");
-        if (columnVisibility.nocByHod) rowData.push(app.documents.nocByHod ? "Uploaded" : "Not uploaded");
-        if (columnVisibility.studentLetterToHod) rowData.push(app.documents.studentLetterToHod ? "Uploaded" : "Not uploaded");
+        
+        // Update document links to include actual URLs
+        if (columnVisibility.offerLetter) {
+          const link = getDocumentLink(app.id, "offerLetter", !!app.documents.offerLetter);
+          rowData.push(link);
+        }
+        
+        if (columnVisibility.nocByHod) {
+          const link = getDocumentLink(app.id, "nocByHod", !!app.documents.nocByHod);
+          rowData.push(link);
+        }
+        
+        if (columnVisibility.studentLetterToHod) {
+          const link = getDocumentLink(app.id, "studentLetterToHod", !!app.documents.studentLetterToHod);
+          rowData.push(link);
+        }
         
         return rowData;
       }),
@@ -192,3 +205,4 @@ const AdminDashboard: React.FC = () => {
 };
 
 export default AdminDashboard;
+

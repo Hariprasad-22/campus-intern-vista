@@ -15,6 +15,7 @@ const Index = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  // If already authenticated, redirect to appropriate dashboard
   if (user) {
     return <Navigate to={user.role === "admin" ? "/admin" : "/dashboard"} />;
   }
@@ -27,9 +28,9 @@ const Index = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <Card className="w-[400px]">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Welcome</CardTitle>
+          <CardTitle className="text-2xl text-center">Welcome to Internship Portal</CardTitle>
           <CardDescription className="text-center">
-            Choose your role to continue
+            Please choose your role to continue
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
