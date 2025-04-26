@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,8 +35,9 @@ const companyInfoSchema = z.object({
   roleOffered: z.string().min(1, "Role is required"),
   stipend: z.string().min(1, "Stipend is required"),
   duration: z.string().min(1, "Duration is required"),
+  internshipYear: z.string().min(1, "Internship year is required"),
   hrName: z.string().min(1, "HR name is required"),
-  hrMobile: z.string().min(10, "HR mobile number must be at least 10 digits"),
+  hrMobile: z.string().regex(/^\d{10}$/, "HR mobile number must be exactly 10 digits"),
   hrEmail: z.string().email("Invalid HR email format"),
 });
 
@@ -59,6 +59,7 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
       roleOffered: "",
       stipend: "",
       duration: "",
+      internshipYear: "",
       hrName: "",
       hrMobile: "",
       hrEmail: "",
@@ -66,13 +67,11 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
   });
 
   const [open, setOpen] = React.useState(false);
+  const [customCompany, setCustomCompany] = React.useState("");
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-6 max-w-2xl mx-auto"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-2xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
@@ -80,56 +79,60 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Company Name</FormLabel>
-                <Popover open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger asChild>
-                    <FormControl>
+                <div className="flex flex-col gap-2">
+                  <Input
+                    placeholder="Enter company name"
+                    value={customCompany}
+                    onChange={(e) => {
+                      setCustomCompany(e.target.value);
+                      form.setValue("companyName", e.target.value);
+                    }}
+                  />
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         role="combobox"
                         aria-expanded={open}
-                        className="justify-between w-full"
+                        className="justify-between"
                       >
-                        {field.value
-                          ? field.value
-                          : "Select or type company name"}
+                        Or select from list
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-full p-0">
-                    <Command>
-                      <CommandInput
-                        placeholder="Search company..."
-                        className="h-9"
-                      />
-                      <CommandList>
-                        <CommandEmpty>No company found.</CommandEmpty>
-                        <CommandGroup>
-                          {companies.map((company) => (
-                            <CommandItem
-                              key={company}
-                              value={company}
-                              onSelect={() => {
-                                form.setValue("companyName", company);
-                                setOpen(false);
-                              }}
-                            >
-                              {company}
-                              <Check
-                                className={cn(
-                                  "ml-auto h-4 w-4",
-                                  field.value === company
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput placeholder="Search company..." />
+                        <CommandList>
+                          <CommandEmpty>No company found.</CommandEmpty>
+                          <CommandGroup>
+                            {companies.map((company) => (
+                              <CommandItem
+                                key={company}
+                                value={company}
+                                onSelect={(value) => {
+                                  setCustomCompany(value);
+                                  form.setValue("companyName", value);
+                                  setOpen(false);
+                                }}
+                              >
+                                {company}
+                                <Check
+                                  className={cn(
+                                    "ml-auto h-4 w-4",
+                                    customCompany === company
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
                 <FormMessage />
               </FormItem>
             )}
@@ -179,6 +182,24 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
 
           <FormField
             control={form.control}
+            name="internshipYear"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Internship Year</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="text" 
+                    placeholder="2024" 
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="hrName"
             render={({ field }) => (
               <FormItem>
@@ -198,7 +219,13 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
               <FormItem>
                 <FormLabel>HR Mobile Number</FormLabel>
                 <FormControl>
-                  <Input placeholder="9876543210" {...field} />
+                  <Input 
+                    placeholder="9876543210" 
+                    maxLength={10}
+                    pattern="\d{10}"
+                    inputMode="numeric"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

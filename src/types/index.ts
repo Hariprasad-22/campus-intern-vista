@@ -25,6 +25,7 @@ export interface CompanyInfo {
   roleOffered: string;
   stipend: string;
   duration: string;
+  internshipYear: string;
   hrName: string;
   hrMobile: string;
   hrEmail: string;

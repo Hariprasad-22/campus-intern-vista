@@ -13,6 +13,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Table,
   TableBody,
   TableCell,
@@ -22,10 +28,15 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Download, Filter, Search } from "lucide-react";
+import { Download, Filter } from "lucide-react";
 import Header from "@/components/Header";
 import { branches, courses, companies } from "@/data/mockData";
 import { InternshipApplication, FeedbackForm } from "@/types";
+
+// Add column visibility type
+type ColumnVisibility = {
+  [key: string]: boolean;
+};
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -48,13 +59,30 @@ const AdminDashboard: React.FC = () => {
     status: "All Status",
   });
 
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
+    rollNumber: true,
+    studentName: true,
+    branch: true,
+    year: true,
+    course: true,
+    company: true,
+    role: true,
+    duration: true,
+    stipend: true,
+    startDate: true,
+    status: true,
+    offerLetter: true,
+    nocByHod: true,
+    studentLetterToHod: true,
+  });
+
   const filterApplications = () => {
     return applications.filter((application) => {
       return (
         (filters.rollNumber === "" || 
           application.studentInfo.rollNumber.toLowerCase().includes(filters.rollNumber.toLowerCase())) &&
         (filters.studentName === "" || 
-          application.studentInfo.email.toLowerCase().includes(filters.studentName.toLowerCase())) &&
+          application.studentInfo.fullName.toLowerCase().includes(filters.studentName.toLowerCase())) &&
         (filters.branch === "All Branches" || 
           application.studentInfo.branch === filters.branch) &&
         (filters.year === "All Years" || 
@@ -79,29 +107,44 @@ const AdminDashboard: React.FC = () => {
     
     if (type === "applications") {
       const filteredData = filterApplications();
+      const headers = [
+        "Roll No",
+        "Student Name",
+        "Branch",
+        "Year",
+        "Course",
+        "Company",
+        "Role",
+        "Duration",
+        "Stipend",
+        "Start Date",
+        "Status",
+        "Offer Letter",
+        "NOC by HOD",
+        "Student Letter to HOD",
+      ].filter((header) => columnVisibility[header.toLowerCase().replace(/ /g, "")]);
+
       data = [
-        [
-          "Roll No",
-          "Student Name",
-          "Branch",
-          "Year",
-          "Company",
-          "Role",
-          "Duration",
-          "Start Date",
-          "Status",
-        ],
-        ...filteredData.map((app) => [
-          app.studentInfo.rollNumber,
-          app.studentInfo.email.split("@")[0], // Using email as name for demo
-          app.studentInfo.branch,
-          app.studentInfo.year,
-          app.companyInfo.companyName,
-          app.companyInfo.roleOffered,
-          `${app.companyInfo.duration} months`,
-          format(new Date(app.internshipDuration.startDate!), "yyyy-MM-dd"),
-          app.status,
-        ]),
+        headers,
+        ...filteredData.map((app) => {
+          const row = [
+            app.studentInfo.rollNumber,
+            app.studentInfo.fullName,
+            app.studentInfo.branch,
+            app.studentInfo.year,
+            app.studentInfo.course,
+            app.companyInfo.companyName,
+            app.companyInfo.roleOffered,
+            `${app.companyInfo.duration} months`,
+            `₹${app.companyInfo.stipend}`,
+            format(new Date(app.internshipDuration.startDate!), "yyyy-MM-dd"),
+            app.status,
+            app.documents.offerLetter ? "Uploaded" : "Not uploaded",
+            app.documents.nocByHod ? "Uploaded" : "Not uploaded",
+            app.documents.studentLetterToHod ? "Uploaded" : "Not uploaded",
+          ];
+          return row.filter((_, index) => columnVisibility[headers[index].toLowerCase().replace(/ /g, "")]);
+        }),
       ];
       filename = "internship-applications.csv";
     } else {
@@ -149,75 +192,101 @@ const AdminDashboard: React.FC = () => {
           <TabsContent value="applications">
             <div className="bg-card p-6 rounded-lg shadow-sm space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="text-sm font-medium">Roll Number</label>
-                  <Input
-                    placeholder="Filter by roll number"
-                    value={filters.rollNumber}
-                    onChange={(e) => setFilters({ ...filters, rollNumber: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Student Name</label>
-                  <Input
-                    placeholder="Filter by student name"
-                    value={filters.studentName}
-                    onChange={(e) => setFilters({ ...filters, studentName: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Branch</label>
-                  <Select
-                    value={filters.branch}
-                    onValueChange={(value) => setFilters({ ...filters, branch: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Branches" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="All Branches">All Branches</SelectItem>
-                      {branches.map((branch) => (
-                        <SelectItem key={branch} value={branch}>
-                          {branch}
-                        </SelectItem>
+                <Select
+                  value={filters.branch}
+                  onValueChange={(value) => setFilters({ ...filters, branch: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Branch" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All Branches">All Branches</SelectItem>
+                    {branches.map((branch) => (
+                      <SelectItem key={branch} value={branch}>
+                        {branch}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  value={filters.year}
+                  onValueChange={(value) => setFilters({ ...filters, year: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All Years">All Years</SelectItem>
+                    {[1, 2, 3, 4, 5].map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  value={filters.course}
+                  onValueChange={(value) => setFilters({ ...filters, course: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Course" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All Courses">All Courses</SelectItem>
+                    {courses.map((course) => (
+                      <SelectItem key={course} value={course}>
+                        {course}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  value={filters.company}
+                  onValueChange={(value) => setFilters({ ...filters, company: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Company" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All Companies">All Companies</SelectItem>
+                    {companies.map((company) => (
+                      <SelectItem key={company} value={company}>
+                        {company}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <div className="flex justify-between items-center">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline">
+                        Display Columns
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      {Object.keys(columnVisibility).map((column) => (
+                        <DropdownMenuCheckboxItem
+                          key={column}
+                          checked={columnVisibility[column]}
+                          onCheckedChange={(checked) => {
+                            setColumnVisibility({
+                              ...columnVisibility,
+                              [column]: checked,
+                            });
+                          }}
+                        >
+                          {column
+                            .replace(/([A-Z])/g, " $1")
+                            .replace(/^./, (str) => str.toUpperCase())
+                            .trim()}
+                        </DropdownMenuCheckboxItem>
                       ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Year</label>
-                  <Select
-                    value={filters.year}
-                    onValueChange={(value) => setFilters({ ...filters, year: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Years" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="All Years">All Years</SelectItem>
-                      {[1, 2, 3, 4, 5].map((year) => (
-                        <SelectItem key={year} value={year.toString()}>
-                          {year}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Role</label>
-                  <Input
-                    placeholder="Filter by role"
-                    value={filters.role}
-                    onChange={(e) => setFilters({ ...filters, role: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Duration (months)</label>
-                  <Input
-                    placeholder="Filter by duration"
-                    value={filters.duration}
-                    onChange={(e) => setFilters({ ...filters, duration: e.target.value })}
-                  />
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
 
@@ -251,49 +320,89 @@ const AdminDashboard: React.FC = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Roll No</TableHead>
-                      <TableHead>Student Name</TableHead>
-                      <TableHead>Branch</TableHead>
-                      <TableHead>Year</TableHead>
-                      <TableHead>Mobile</TableHead>
-                      <TableHead>Company</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead>Duration</TableHead>
-                      <TableHead>Stipend</TableHead>
-                      <TableHead>Start Date</TableHead>
-                      <TableHead>Status</TableHead>
+                      {columnVisibility.rollNumber && <TableHead>Roll No</TableHead>}
+                      {columnVisibility.studentName && <TableHead>Student Name</TableHead>}
+                      {columnVisibility.branch && <TableHead>Branch</TableHead>}
+                      {columnVisibility.year && <TableHead>Year</TableHead>}
+                      {columnVisibility.course && <TableHead>Course</TableHead>}
+                      {columnVisibility.company && <TableHead>Company</TableHead>}
+                      {columnVisibility.role && <TableHead>Role</TableHead>}
+                      {columnVisibility.duration && <TableHead>Duration</TableHead>}
+                      {columnVisibility.stipend && <TableHead>Stipend</TableHead>}
+                      {columnVisibility.startDate && <TableHead>Start Date</TableHead>}
+                      {columnVisibility.status && <TableHead>Status</TableHead>}
+                      {columnVisibility.offerLetter && <TableHead>Offer Letter</TableHead>}
+                      {columnVisibility.nocByHod && <TableHead>NOC by HOD</TableHead>}
+                      {columnVisibility.studentLetterToHod && <TableHead>Student Letter to HOD</TableHead>}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filterApplications().map((application) => (
                       <TableRow key={application.id}>
-                        <TableCell>{application.studentInfo.rollNumber}</TableCell>
-                        <TableCell>{application.studentInfo.email.split("@")[0]}</TableCell>
-                        <TableCell>{application.studentInfo.branch}</TableCell>
-                        <TableCell>{application.studentInfo.year}</TableCell>
-                        <TableCell>{application.studentInfo.mobileNumber}</TableCell>
-                        <TableCell>{application.companyInfo.companyName}</TableCell>
-                        <TableCell>{application.companyInfo.roleOffered}</TableCell>
-                        <TableCell>{application.companyInfo.duration} months</TableCell>
-                        <TableCell>₹{application.companyInfo.stipend}</TableCell>
-                        <TableCell>
-                          {format(new Date(application.internshipDuration.startDate!), "MMM dd, yyyy")}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            className={`${
-                              application.status === "approved"
-                                ? "bg-green-500"
-                                : application.status === "rejected"
-                                ? "bg-red-500"
-                                : application.status === "completed"
-                                ? "bg-blue-500"
-                                : "bg-yellow-500"
-                            }`}
-                          >
-                            {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
-                          </Badge>
-                        </TableCell>
+                        {columnVisibility.rollNumber && (
+                          <TableCell>{application.studentInfo.rollNumber}</TableCell>
+                        )}
+                        {columnVisibility.studentName && (
+                          <TableCell>{application.studentInfo.fullName}</TableCell>
+                        )}
+                        {columnVisibility.branch && (
+                          <TableCell>{application.studentInfo.branch}</TableCell>
+                        )}
+                        {columnVisibility.year && (
+                          <TableCell>{application.studentInfo.year}</TableCell>
+                        )}
+                        {columnVisibility.course && (
+                          <TableCell>{application.studentInfo.course}</TableCell>
+                        )}
+                        {columnVisibility.company && (
+                          <TableCell>{application.companyInfo.companyName}</TableCell>
+                        )}
+                        {columnVisibility.role && (
+                          <TableCell>{application.companyInfo.roleOffered}</TableCell>
+                        )}
+                        {columnVisibility.duration && (
+                          <TableCell>{application.companyInfo.duration} months</TableCell>
+                        )}
+                        {columnVisibility.stipend && (
+                          <TableCell>₹{application.companyInfo.stipend}</TableCell>
+                        )}
+                        {columnVisibility.startDate && (
+                          <TableCell>
+                            {format(new Date(application.internshipDuration.startDate!), "MMM dd, yyyy")}
+                          </TableCell>
+                        )}
+                        {columnVisibility.status && (
+                          <TableCell>
+                            <Badge
+                              className={`${
+                                application.status === "approved"
+                                  ? "bg-green-500"
+                                  : application.status === "rejected"
+                                  ? "bg-red-500"
+                                  : application.status === "completed"
+                                  ? "bg-blue-500"
+                                  : "bg-yellow-500"
+                              }`}
+                            >
+                              {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
+                            </Badge>
+                          </TableCell>
+                        )}
+                        {columnVisibility.offerLetter && (
+                          <TableCell>
+                            {application.documents.offerLetter ? "Uploaded" : "Not uploaded"}
+                          </TableCell>
+                        )}
+                        {columnVisibility.nocByHod && (
+                          <TableCell>
+                            {application.documents.nocByHod ? "Uploaded" : "Not uploaded"}
+                          </TableCell>
+                        )}
+                        {columnVisibility.studentLetterToHod && (
+                          <TableCell>
+                            {application.documents.studentLetterToHod ? "Uploaded" : "Not uploaded"}
+                          </TableCell>
+                        )}
                       </TableRow>
                     ))}
                   </TableBody>

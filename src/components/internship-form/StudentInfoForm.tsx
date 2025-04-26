@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { branches, courses } from "@/data/mockData";
 
+const semesters = Array.from({ length: 8 }, (_, i) => (i + 1).toString());
 const years = ["1", "2", "3", "4"];
 
 const studentInfoSchema = z.object({
@@ -34,7 +34,7 @@ const studentInfoSchema = z.object({
   year: z.string().min(1, "Year is required"),
   semester: z.string().min(1, "Semester is required"),
   email: z.string().email("Invalid email format"),
-  mobileNumber: z.string().regex(/^\d{10}$/, "Mobile number must be 10 digits"),
+  mobileNumber: z.string().regex(/^\d{10}$/, "Mobile number must be exactly 10 digits"),
   academicYear: z.string().min(1, "Academic year is required"),
 });
 
@@ -180,9 +180,20 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Semester</FormLabel>
-                <FormControl>
-                  <Input placeholder="5" type="number" {...field} />
-                </FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select semester" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {semesters.map((sem) => (
+                      <SelectItem key={sem} value={sem}>
+                        Semester {sem}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -210,7 +221,13 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               <FormItem>
                 <FormLabel>Mobile Number</FormLabel>
                 <FormControl>
-                  <Input placeholder="9876543210" type="tel" {...field} />
+                  <Input 
+                    placeholder="9876543210" 
+                    maxLength={10}
+                    pattern="\d{10}"
+                    inputMode="numeric"
+                    {...field} 
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
