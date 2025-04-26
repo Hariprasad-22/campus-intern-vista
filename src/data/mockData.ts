@@ -1,3 +1,4 @@
+
 import { InternshipApplication, User, FeedbackForm } from "../types";
 
 export const users: User[] = [
@@ -75,6 +76,7 @@ const mockApplications: InternshipApplication[] = [
       roleOffered: "Software Engineer Intern",
       stipend: "50000",
       duration: "3",
+      internshipYear: "2023", // Added the missing internshipYear property
       hrName: "Jane Doe",
       hrMobile: "9876543211",
       hrEmail: "jane@google.com",

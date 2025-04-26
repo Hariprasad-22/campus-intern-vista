@@ -1,5 +1,5 @@
 
-import React, { ErrorBoundary } from "react";
+import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 import Header from "@/components/Header";
