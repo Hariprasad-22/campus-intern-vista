@@ -1,4 +1,3 @@
-
 import { InternshipApplication, User, FeedbackForm } from "../types";
 
 export const users: User[] = [
@@ -94,7 +93,80 @@ const mockApplications: InternshipApplication[] = [
   },
 ];
 
-export const applications: InternshipApplication[] = mockApplications;
+export const applications: InternshipApplication[] = [
+  {
+    id: "app-1",
+    studentId: "student-1",
+    studentInfo: {
+      fullName: "John Doe",
+      rollNumber: "2022CS001",
+      course: "B.Tech",
+      branch: "Computer Science",
+      year: "3",
+      semester: "5",
+      email: "john.doe@example.com",
+      mobileNumber: "9876543210",
+      academicYear: "2023-24",
+    },
+    companyInfo: {
+      companyName: "Google",
+      roleOffered: "Software Engineer Intern",
+      stipend: "50000",
+      duration: "3",
+      internshipYear: "2024",
+      hrName: "Jane Smith",
+      hrMobile: "9876543210",
+      hrEmail: "hr@google.com",
+    },
+    internshipDuration: {
+      startDate: new Date("2024-05-15"),
+      endDate: new Date("2024-08-15"),
+    },
+    documents: {
+      offerLetter: null,
+      nocByHod: null,
+      studentLetterToHod: null,
+    },
+    createdAt: new Date("2024-03-10"),
+    status: "pending",
+  },
+  {
+    id: "app-2",
+    studentId: "student-2",
+    studentInfo: {
+      fullName: "Alice Johnson",
+      rollNumber: "2021EC045",
+      course: "B.Tech",
+      branch: "Electronics",
+      year: "4",
+      semester: "7",
+      email: "alice.johnson@example.com",
+      mobileNumber: "9876543211",
+      academicYear: "2023-24",
+    },
+    companyInfo: {
+      companyName: "Microsoft",
+      roleOffered: "Frontend Developer Intern",
+      stipend: "45000",
+      duration: "2",
+      internshipYear: "2024",
+      hrName: "Robert Brown",
+      hrMobile: "9876543212",
+      hrEmail: "hr@microsoft.com",
+    },
+    internshipDuration: {
+      startDate: new Date("2024-06-01"),
+      endDate: new Date("2024-07-31"),
+    },
+    documents: {
+      offerLetter: null,
+      nocByHod: null,
+      studentLetterToHod: null,
+    },
+    createdAt: new Date("2024-03-15"),
+    status: "approved",
+  },
+];
 
 export const feedbacks: FeedbackForm[] = [
   {

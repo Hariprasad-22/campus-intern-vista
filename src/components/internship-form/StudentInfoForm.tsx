@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { branches, courses } from "@/data/mockData";
 
+// Create arrays for semesters (1-8) and years (1-4)
 const semesters = Array.from({ length: 8 }, (_, i) => (i + 1).toString());
 const years = ["1", "2", "3", "4"];
 

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -200,7 +201,7 @@ const AdminDashboard: React.FC = () => {
                     <SelectValue placeholder="Select Branch" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="All Branches">All Branches</SelectItem>
+                    <SelectItem key="all-branches" value="All Branches">All Branches</SelectItem>
                     {branches.map((branch) => (
                       <SelectItem key={branch} value={branch}>
                         {branch}
@@ -217,7 +218,7 @@ const AdminDashboard: React.FC = () => {
                     <SelectValue placeholder="Select Year" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="All Years">All Years</SelectItem>
+                    <SelectItem key="all-years" value="All Years">All Years</SelectItem>
                     {[1, 2, 3, 4, 5].map((year) => (
                       <SelectItem key={year} value={year.toString()}>
                         {year}
@@ -234,7 +235,7 @@ const AdminDashboard: React.FC = () => {
                     <SelectValue placeholder="Select Course" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="All Courses">All Courses</SelectItem>
+                    <SelectItem key="all-courses" value="All Courses">All Courses</SelectItem>
                     {courses.map((course) => (
                       <SelectItem key={course} value={course}>
                         {course}
@@ -251,7 +252,7 @@ const AdminDashboard: React.FC = () => {
                     <SelectValue placeholder="Select Company" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="All Companies">All Companies</SelectItem>
+                    <SelectItem key="all-companies" value="All Companies">All Companies</SelectItem>
                     {companies.map((company) => (
                       <SelectItem key={company} value={company}>
                         {company}
