@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,9 +11,10 @@ import ApplicationsTable from "@/components/admin/ApplicationsTable";
 import FeedbackTable from "@/components/admin/FeedbackTable";
 import { exportToCSV, getDocumentLink } from "@/utils/csvExport";
 import { InternshipApplication, FeedbackForm } from "@/types";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
