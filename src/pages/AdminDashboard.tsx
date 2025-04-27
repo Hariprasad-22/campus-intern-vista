@@ -137,6 +137,39 @@ const AdminDashboard: React.FC = () => {
     exportToCSV(data, "internship-applications.csv");
   };
 
+  const handleExportFeedbackCsv = () => {
+    const headers = [
+      "Student",
+      "Company",
+      "Role",
+      "Rating",
+      "Skills Learned",
+      "Experience",
+      "Submitted On"
+    ];
+
+    const data = [
+      headers,
+      ...feedbacks.map((feedback) => {
+        const application = applications.find(
+          (app) => app.id === feedback.applicationId
+        );
+        
+        return [
+          application?.studentInfo.email.split("@")[0] || "Unknown",
+          application?.companyInfo.companyName || "Unknown",
+          application?.companyInfo.roleOffered || "Unknown",
+          `${feedback.rating}/5`,
+          feedback.skills,
+          feedback.experience,
+          format(new Date(feedback.createdAt), "yyyy-MM-dd")
+        ];
+      }),
+    ];
+
+    exportToCSV(data, "internship-feedback.csv");
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
