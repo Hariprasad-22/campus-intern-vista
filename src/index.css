@@ -4,12 +4,11 @@
 
 @layer base {
   body {
-    background-color: #fcded8;
+    @apply bg-pageBackground;
   }
   
   nav, .navbar {
-    background-color: #b82132;
-    color: white;
+    @apply bg-navbar text-white;
   }
 
   :root {

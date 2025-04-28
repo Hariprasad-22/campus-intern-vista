@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +18,7 @@ export const Header = () => {
   };
 
   return (
-    <header className="w-full bg-header text-white p-4 flex justify-between items-center">
+    <header className="w-full bg-navbar text-white p-4 flex justify-between items-center">
       <div 
         className="text-xl font-semibold cursor-pointer" 
         onClick={() => navigate(user?.role === "student" ? "/dashboard" : "/admin")}

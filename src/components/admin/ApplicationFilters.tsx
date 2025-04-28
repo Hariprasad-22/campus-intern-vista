@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -207,14 +206,21 @@ const ApplicationFilters: React.FC<ApplicationFiltersProps> = ({
           className="w-full"
         />
 
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center space-x-4">
+          <Button
+            variant="outline"
+            onClick={resetFilters}
+          >
+            Reset Filters
+          </Button>
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
                 Display Columns
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="w-[200px] max-h-[400px] overflow-y-auto">
               {Object.keys(columnVisibility).map((column) => (
                 <DropdownMenuCheckboxItem
                   key={column}
@@ -237,13 +243,7 @@ const ApplicationFilters: React.FC<ApplicationFiltersProps> = ({
         </div>
       </div>
 
-      <div className="flex justify-between items-center mt-4">
-        <Button
-          variant="outline"
-          onClick={resetFilters}
-        >
-          Reset Filters
-        </Button>
+      <div className="flex justify-end mt-4">
         <Button
           variant="outline"
           onClick={handleExportToCSV}
