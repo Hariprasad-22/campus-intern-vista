@@ -85,9 +85,7 @@ const AdminDashboard: React.FC = () => {
         (filters.duration === "" || 
           application.companyInfo.duration === filters.duration) &&
         (filters.internshipYear === "All Internship Years" || 
-          application.companyInfo.internshipYear === filters.internshipYear) &&
-        (filters.status === "All Status" || 
-          application.status === filters.status.toLowerCase())
+          application.companyInfo.internshipYear === filters.internshipYear)
       );
     });
   };
@@ -103,6 +101,7 @@ const AdminDashboard: React.FC = () => {
         .trim()
     );
 
+    const baseUrl = window.location.origin;
     const data = [
       headers,
       ...filteredData.map((app) => {
@@ -129,7 +128,12 @@ const AdminDashboard: React.FC = () => {
           rowData.push(app.internshipDuration.startDate ? format(new Date(app.internshipDuration.startDate), "yyyy-MM-dd") : "Not set");
         if (columnVisibility.endDate)
           rowData.push(app.internshipDuration.endDate ? format(new Date(app.internshipDuration.endDate), "yyyy-MM-dd") : "Not set");
-        if (columnVisibility.status) rowData.push(app.status);
+        if (columnVisibility.offerLetter)
+          rowData.push(app.documents.offerLetter ? `${baseUrl}/document/view/${app.id}/offerLetter` : "Not uploaded");
+        if (columnVisibility.nocByHod)
+          rowData.push(app.documents.nocByHod ? `${baseUrl}/document/view/${app.id}/nocByHod` : "Not uploaded");
+        if (columnVisibility.studentLetterToHod)
+          rowData.push(app.documents.studentLetterToHod ? `${baseUrl}/document/view/${app.id}/studentLetterToHod` : "Not uploaded");
         
         return rowData;
       }),

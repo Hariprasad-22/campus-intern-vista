@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -75,20 +74,6 @@ const StudentDashboard: React.FC = () => {
                     <CardTitle className="text-lg">
                       {application.companyInfo.companyName}
                     </CardTitle>
-                    <Badge
-                      className={`${
-                        application.status === "approved"
-                          ? "bg-green-500"
-                          : application.status === "rejected"
-                          ? "bg-red-500"
-                          : application.status === "completed"
-                          ? "bg-blue-500"
-                          : "bg-yellow-500"
-                      }`}
-                    >
-                      {application.status.charAt(0).toUpperCase() +
-                        application.status.slice(1)}
-                    </Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-2">

@@ -21,7 +21,6 @@ import { branches, courses, companies } from "@/data/mockData";
 const academicYears = ["2022-23", "2023-24", "2024-25"];
 const internshipYears = ["2022", "2023", "2024", "2025"];
 const studentYears = ["1", "2", "3", "4", "5"];
-const statuses = ["pending", "approved", "rejected", "completed"];
 
 type FilterValues = {
   rollNumber: string;
@@ -34,7 +33,6 @@ type FilterValues = {
   role: string;
   duration: string;
   internshipYear: string;
-  status: string;
 };
 
 type ColumnVisibility = Record<string, boolean>;
@@ -66,7 +64,6 @@ const ApplicationFilters: React.FC<ApplicationFiltersProps> = ({
       role: "",
       duration: "",
       internshipYear: "All Internship Years",
-      status: "All Status",
     });
   };
 
@@ -175,45 +172,7 @@ const ApplicationFilters: React.FC<ApplicationFiltersProps> = ({
           </SelectContent>
         </Select>
 
-        <Select
-          value={filters.status}
-          onValueChange={(value) => setFilters({ ...filters, status: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem key="all-status" value="All Status">All Status</SelectItem>
-            {statuses.map((status) => (
-              <SelectItem key={status} value={status}>
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Input
-          placeholder="Search by Roll Number"
-          value={filters.rollNumber}
-          onChange={(e) => setFilters({ ...filters, rollNumber: e.target.value })}
-          className="w-full"
-        />
-
-        <Input
-          placeholder="Search by Student Name"
-          value={filters.studentName}
-          onChange={(e) => setFilters({ ...filters, studentName: e.target.value })}
-          className="w-full"
-        />
-
         <div className="flex justify-between items-center space-x-4">
-          <Button
-            variant="outline"
-            onClick={resetFilters}
-          >
-            Reset Filters
-          </Button>
-          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
@@ -240,6 +199,13 @@ const ApplicationFilters: React.FC<ApplicationFiltersProps> = ({
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <Button
+            variant="outline"
+            onClick={resetFilters}
+          >
+            Reset Filters
+          </Button>
         </div>
       </div>
 
