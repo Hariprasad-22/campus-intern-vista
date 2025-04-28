@@ -172,14 +172,14 @@ const ApplicationFilters: React.FC<ApplicationFiltersProps> = ({
           </SelectContent>
         </Select>
 
-        <div className="flex justify-between items-center space-x-4">
+        <div className="flex items-center space-x-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
                 Display Columns
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[200px] max-h-[400px] overflow-y-auto">
+            <DropdownMenuContent align="start" className="w-[200px] max-h-[400px] overflow-y-auto">
               {Object.keys(columnVisibility).map((column) => (
                 <DropdownMenuCheckboxItem
                   key={column}
@@ -202,21 +202,19 @@ const ApplicationFilters: React.FC<ApplicationFiltersProps> = ({
 
           <Button
             variant="outline"
+            onClick={handleExportToCSV}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export to CSV
+          </Button>
+
+          <Button
+            variant="outline"
             onClick={resetFilters}
           >
             Reset Filters
           </Button>
         </div>
-      </div>
-
-      <div className="flex justify-end mt-4">
-        <Button
-          variant="outline"
-          onClick={handleExportToCSV}
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Export to CSV
-        </Button>
       </div>
     </>
   );
