@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -171,19 +172,19 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-pageBackground">
       <Header />
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto py-8 px-4">
         <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
 
         <Tabs defaultValue="applications" className="space-y-6">
-          <TabsList>
+          <TabsList className="bg-white">
             <TabsTrigger value="applications">Applications</TabsTrigger>
             <TabsTrigger value="feedback">Feedback</TabsTrigger>
           </TabsList>
 
           <TabsContent value="applications">
-            <div className="bg-card p-6 rounded-lg shadow-sm space-y-6">
+            <div className="bg-white p-6 rounded-lg shadow-sm space-y-6 overflow-x-auto">
               <ApplicationFilters 
                 filters={filters}
                 setFilters={setFilters}
@@ -192,11 +193,13 @@ const AdminDashboard: React.FC = () => {
                 handleExportToCSV={handleExportApplicationsCsv}
               />
               
-              <ApplicationsTable 
-                filteredApplications={filterApplications()}
-                columnVisibility={columnVisibility}
-                onApplicationSelect={setSelectedApplication}
-              />
+              <div className="w-full overflow-x-auto">
+                <ApplicationsTable 
+                  filteredApplications={filterApplications()}
+                  columnVisibility={columnVisibility}
+                  onApplicationSelect={setSelectedApplication}
+                />
+              </div>
             </div>
           </TabsContent>
 
@@ -207,11 +210,13 @@ const AdminDashboard: React.FC = () => {
                 View feedback submitted by students after completing internships
               </p>
 
-              <FeedbackTable 
-                feedbacks={feedbacks}
-                applications={applications} 
-                handleExportToCSV={handleExportFeedbackCsv}
-              />
+              <div className="w-full overflow-x-auto">
+                <FeedbackTable 
+                  feedbacks={feedbacks}
+                  applications={applications} 
+                  handleExportToCSV={handleExportFeedbackCsv}
+                />
+              </div>
             </div>
           </TabsContent>
         </Tabs>

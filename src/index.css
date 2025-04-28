@@ -3,6 +3,15 @@
 @tailwind utilities;
 
 @layer base {
+  body {
+    background-color: #fcded8;
+  }
+  
+  nav, .navbar {
+    background-color: #b82132;
+    color: white;
+  }
+
   :root {
     --background: 220 33% 98%;
     --foreground: 220 13% 10%;
