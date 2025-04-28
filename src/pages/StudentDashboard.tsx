@@ -39,7 +39,7 @@ const StudentDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-pageBackground">
       <Header />
       <div className="container mx-auto py-8">
         <div className="flex justify-between items-center mb-8">

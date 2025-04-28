@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
@@ -61,7 +60,7 @@ const NewApplication: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-pageBackground">
       <Header />
       <div className="container mx-auto py-8">
         <SelectErrorBoundary>
