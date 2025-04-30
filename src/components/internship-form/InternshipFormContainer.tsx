@@ -99,7 +99,7 @@ const InternshipFormContainer: React.FC = () => {
         );
       }
 
-      // Save application data to Supabase
+      // Save application data to Supabase - Fix the insert operation
       const { data, error } = await supabase
         .from('internship_applications')
         .insert({
@@ -126,7 +126,9 @@ const InternshipFormContainer: React.FC = () => {
           start_date: internshipDuration.startDate,
           end_date: internshipDuration.endDate,
           
-          ...documentPaths,
+          offer_letter_path: documentPaths.offer_letter_path,
+          noc_by_hod_path: documentPaths.noc_by_hod_path,
+          student_letter_to_hod_path: documentPaths.student_letter_to_hod_path,
           
           status: 'pending'
         })
