@@ -1,39 +1,95 @@
-import React from "react";
+
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
-import { applications, feedbacks } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Plus } from "lucide-react";
+import { FileText, Plus, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+interface InternshipApplication {
+  id: string;
+  student_id: string;
+  full_name: string;
+  company_name: string;
+  role_offered: string;
+  stipend: string;
+  start_date: string;
+  end_date: string;
+  status: string;
+  offer_letter_path?: string;
+  noc_by_hod_path?: string;
+  student_letter_to_hod_path?: string;
+  created_at: string;
+}
+
+interface Feedback {
+  id: string;
+  application_id: string;
+}
 
 const StudentDashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [selectedApplication, setSelectedApplication] = React.useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [applications, setApplications] = useState<InternshipApplication[]>([]);
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  const [selectedApplication, setSelectedApplication] = useState<InternshipApplication | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // Fetch internship applications
+        const { data: applicationsData, error: applicationsError } = await supabase
+          .from('internship_applications')
+          .select('*')
+          .eq('student_id', user.id);
+
+        if (applicationsError) throw applicationsError;
+        
+        // Fetch feedbacks
+        const { data: feedbacksData, error: feedbacksError } = await supabase
+          .from('internship_feedback')
+          .select('id, application_id');
+
+        if (feedbacksError) throw feedbacksError;
+
+        setApplications(applicationsData || []);
+        setFeedbacks(feedbacksData || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        toast.error('Failed to load applications. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [user]);
 
   if (!user) {
     navigate("/login");
     return null;
   }
 
-  const studentApplications = applications.filter(
-    (application) => application.studentId === user.id
-  );
-
   const hasFeedback = (applicationId: string) => {
-    return feedbacks.some((feedback) => feedback.applicationId === applicationId);
+    return feedbacks.some((feedback) => feedback.application_id === applicationId);
   };
 
-  const isInternshipCompleted = (application: any) => {
-    const endDate = new Date(application.internshipDuration.endDate);
-    return endDate < new Date();
+  const isInternshipCompleted = (application: InternshipApplication) => {
+    const endDate = new Date(application.end_date);
+    return endDate < new Date() || application.status === 'completed';
   };
 
-  const handleViewApplication = (application: any) => {
+  const handleViewApplication = (application: InternshipApplication) => {
     setSelectedApplication(application);
   };
 
@@ -51,7 +107,11 @@ const StudentDashboard: React.FC = () => {
           </Button>
         </div>
 
-        {studentApplications.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : applications.length === 0 ? (
           <div className="bg-card rounded-lg shadow-sm p-8 text-center">
             <h2 className="text-xl font-semibold mb-4">No Applications Yet</h2>
             <p className="text-muted-foreground mb-6">
@@ -67,33 +127,49 @@ const StudentDashboard: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {studentApplications.map((application) => (
+            {applications.map((application) => (
               <Card key={application.id} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-lg">
-                      {application.companyInfo.companyName}
+                      {application.company_name}
                     </CardTitle>
+                    <Badge
+                      className={`
+                        ${
+                          application.status === "approved"
+                            ? "bg-green-500"
+                            : application.status === "rejected"
+                            ? "bg-red-500"
+                            : application.status === "completed"
+                            ? "bg-blue-500"
+                            : "bg-yellow-500"
+                        }
+                      `}
+                    >
+                      {application.status.charAt(0).toUpperCase() +
+                        application.status.slice(1)}
+                    </Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <div>
                     <p className="text-sm font-medium">Role</p>
                     <p className="text-sm text-muted-foreground">
-                      {application.companyInfo.roleOffered}
+                      {application.role_offered}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm font-medium">Duration</p>
                     <p className="text-sm text-muted-foreground">
-                      {format(new Date(application.internshipDuration.startDate!), "MMM dd, yyyy")} -{" "}
-                      {format(new Date(application.internshipDuration.endDate!), "MMM dd, yyyy")}
+                      {format(new Date(application.start_date), "MMM dd, yyyy")} -{" "}
+                      {format(new Date(application.end_date), "MMM dd, yyyy")}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm font-medium">Stipend</p>
                     <p className="text-sm text-muted-foreground">
-                      ₹{application.companyInfo.stipend}
+                      ₹{application.stipend}
                     </p>
                   </div>
                 </CardContent>
@@ -136,19 +212,15 @@ const StudentDashboard: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                       <p className="text-sm font-medium">Company Name</p>
-                      <p className="text-sm text-muted-foreground">{selectedApplication.companyInfo.companyName}</p>
+                      <p className="text-sm text-muted-foreground">{selectedApplication.company_name}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium">Role</p>
-                      <p className="text-sm text-muted-foreground">{selectedApplication.companyInfo.roleOffered}</p>
+                      <p className="text-sm text-muted-foreground">{selectedApplication.role_offered}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium">Stipend</p>
-                      <p className="text-sm text-muted-foreground">₹{selectedApplication.companyInfo.stipend}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">Location</p>
-                      <p className="text-sm text-muted-foreground">{selectedApplication.companyInfo.location}</p>
+                      <p className="text-sm text-muted-foreground">₹{selectedApplication.stipend}</p>
                     </div>
                   </div>
                 </div>
@@ -159,18 +231,14 @@ const StudentDashboard: React.FC = () => {
                     <div>
                       <p className="text-sm font-medium">Start Date</p>
                       <p className="text-sm text-muted-foreground">
-                        {format(new Date(selectedApplication.internshipDuration.startDate), "MMM dd, yyyy")}
+                        {format(new Date(selectedApplication.start_date), "MMM dd, yyyy")}
                       </p>
                     </div>
                     <div>
                       <p className="text-sm font-medium">End Date</p>
                       <p className="text-sm text-muted-foreground">
-                        {format(new Date(selectedApplication.internshipDuration.endDate), "MMM dd, yyyy")}
+                        {format(new Date(selectedApplication.end_date), "MMM dd, yyyy")}
                       </p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">Working Hours</p>
-                      <p className="text-sm text-muted-foreground">{selectedApplication.internshipDuration.workingHours || "Not specified"}</p>
                     </div>
                   </div>
                 </div>

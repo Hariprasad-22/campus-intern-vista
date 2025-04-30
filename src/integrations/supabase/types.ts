@@ -9,7 +9,193 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      email_notifications: {
+        Row: {
+          application_id: string
+          company_name: string
+          created_at: string
+          email: string
+          id: string
+          is_sent: boolean | null
+          sent_at: string | null
+          student_name: string
+        }
+        Insert: {
+          application_id: string
+          company_name: string
+          created_at?: string
+          email: string
+          id?: string
+          is_sent?: boolean | null
+          sent_at?: string | null
+          student_name: string
+        }
+        Update: {
+          application_id?: string
+          company_name?: string
+          created_at?: string
+          email?: string
+          id?: string
+          is_sent?: boolean | null
+          sent_at?: string | null
+          student_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_notifications_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "internship_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      internship_applications: {
+        Row: {
+          academic_year: string
+          branch: string
+          company_name: string
+          course: string
+          created_at: string
+          duration: string
+          email: string
+          end_date: string | null
+          full_name: string
+          hr_email: string
+          hr_mobile: string
+          hr_name: string
+          id: string
+          internship_year: string
+          mobile_number: string
+          noc_by_hod_path: string | null
+          offer_letter_path: string | null
+          role_offered: string
+          roll_number: string
+          semester: string
+          start_date: string | null
+          status: string
+          stipend: string
+          student_id: string
+          student_letter_to_hod_path: string | null
+          year: string
+        }
+        Insert: {
+          academic_year: string
+          branch: string
+          company_name: string
+          course: string
+          created_at?: string
+          duration: string
+          email: string
+          end_date?: string | null
+          full_name: string
+          hr_email: string
+          hr_mobile: string
+          hr_name: string
+          id?: string
+          internship_year: string
+          mobile_number: string
+          noc_by_hod_path?: string | null
+          offer_letter_path?: string | null
+          role_offered: string
+          roll_number: string
+          semester: string
+          start_date?: string | null
+          status?: string
+          stipend: string
+          student_id: string
+          student_letter_to_hod_path?: string | null
+          year: string
+        }
+        Update: {
+          academic_year?: string
+          branch?: string
+          company_name?: string
+          course?: string
+          created_at?: string
+          duration?: string
+          email?: string
+          end_date?: string | null
+          full_name?: string
+          hr_email?: string
+          hr_mobile?: string
+          hr_name?: string
+          id?: string
+          internship_year?: string
+          mobile_number?: string
+          noc_by_hod_path?: string | null
+          offer_letter_path?: string | null
+          role_offered?: string
+          roll_number?: string
+          semester?: string
+          start_date?: string | null
+          status?: string
+          stipend?: string
+          student_id?: string
+          student_letter_to_hod_path?: string | null
+          year?: string
+        }
+        Relationships: []
+      }
+      internship_feedback: {
+        Row: {
+          academic_year: string
+          application_id: string
+          company_name: string
+          created_at: string
+          experience: string
+          feedback: string
+          id: string
+          mobile_number: string
+          rating: number | null
+          role: string
+          roll_number: string
+          skills: string
+          student_name: string
+          suggestions: string | null
+        }
+        Insert: {
+          academic_year: string
+          application_id: string
+          company_name: string
+          created_at?: string
+          experience: string
+          feedback: string
+          id?: string
+          mobile_number: string
+          rating?: number | null
+          role: string
+          roll_number: string
+          skills: string
+          student_name: string
+          suggestions?: string | null
+        }
+        Update: {
+          academic_year?: string
+          application_id?: string
+          company_name?: string
+          created_at?: string
+          experience?: string
+          feedback?: string
+          id?: string
+          mobile_number?: string
+          rating?: number | null
+          role?: string
+          roll_number?: string
+          skills?: string
+          student_name?: string
+          suggestions?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internship_feedback_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "internship_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

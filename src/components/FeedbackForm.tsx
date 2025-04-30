@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -5,10 +6,10 @@ import { z } from "zod";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { FeedbackForm as FeedbackFormType } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Loader2 } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -18,8 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { feedbacks } from "@/data/mockData";
-import { v4 as uuidv4 } from "uuid";
+import { supabase } from "@/integrations/supabase/client";
 
 const feedbackSchema = z.object({
   studentName: z.string().min(1, "Name is required"),
@@ -44,6 +44,7 @@ type FeedbackFormProps = {
 const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName, role }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof feedbackSchema>>({
     resolver: zodResolver(feedbackSchema),
@@ -58,31 +59,39 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName,
     },
   });
 
-  const onSubmit = (data: z.infer<typeof feedbackSchema>) => {
+  const onSubmit = async (data: z.infer<typeof feedbackSchema>) => {
     if (!user) return;
 
-    const newFeedback: FeedbackFormType = {
-      id: uuidv4(),
-      applicationId,
-      studentId: user.id,
-      studentName: data.studentName,
-      mobileNumber: data.mobileNumber,
-      rollNumber: data.rollNumber,
-      academicYear: data.academicYear,
-      companyName,
-      role,
-      rating: 0, // Default to 0 since rating is no longer user-selectable
-      feedback: data.feedback,
-      experience: data.experience,
-      skills: data.skills,
-      createdAt: new Date(),
-    };
+    setIsSubmitting(true);
 
-    // In a real app, we'd send this to an API
-    feedbacks.push(newFeedback);
-    
-    toast.success("Feedback submitted successfully!");
-    navigate("/dashboard");
+    try {
+      // Save feedback to Supabase
+      const { error } = await supabase
+        .from('internship_feedback')
+        .insert({
+          application_id: applicationId,
+          student_name: data.studentName,
+          mobile_number: data.mobileNumber,
+          roll_number: data.rollNumber,
+          academic_year: data.academicYear,
+          company_name: companyName,
+          role: role,
+          rating: 0, // Default to 0 since rating is no longer user-selectable
+          feedback: data.feedback,
+          experience: data.experience,
+          skills: data.skills
+        });
+
+      if (error) throw error;
+      
+      toast.success("Feedback submitted successfully!");
+      navigate("/dashboard");
+    } catch (error: any) {
+      console.error("Error submitting feedback:", error);
+      toast.error(error.message || "Failed to submit feedback. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -104,7 +113,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName,
                 <FormItem>
                   <FormLabel>Full Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your full name" {...field} />
+                    <Input placeholder="Enter your full name" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -118,7 +127,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName,
                 <FormItem>
                   <FormLabel>Mobile Number</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your mobile number" {...field} />
+                    <Input placeholder="Enter your mobile number" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -132,7 +141,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName,
                 <FormItem>
                   <FormLabel>Roll Number</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your roll number" {...field} />
+                    <Input placeholder="Enter your roll number" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -146,7 +155,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName,
                 <FormItem>
                   <FormLabel>Academic Year</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. 2023-24" {...field} />
+                    <Input placeholder="e.g. 2023-24" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -179,6 +188,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName,
                         placeholder="Share your internship experience (maximum 200 words)..."
                         className="min-h-[120px]"
                         {...field}
+                        disabled={isSubmitting}
                       />
                     </FormControl>
                     <FormDescription>
@@ -201,6 +211,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName,
                       <Input
                         placeholder="e.g. React, TypeScript, Project Management"
                         {...field}
+                        disabled={isSubmitting}
                       />
                     </FormControl>
                     <FormDescription>
@@ -224,6 +235,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName,
                         placeholder="Describe what you learned during your internship..."
                         className="min-h-[120px]"
                         {...field}
+                        disabled={isSubmitting}
                       />
                     </FormControl>
                     <FormDescription>
@@ -236,8 +248,15 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ applicationId, companyName,
             </div>
           </div>
 
-          <Button type="submit" className="w-full">
-            Submit Feedback
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              "Submit Feedback"
+            )}
           </Button>
         </form>
       </Form>

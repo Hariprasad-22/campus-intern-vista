@@ -3,15 +3,18 @@ import React, { useState } from "react";
 import { Documents } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
 
 type DocumentsUploadFormProps = {
   onSubmit: (data: Documents) => void;
   onBack: () => void;
+  isSubmitting?: boolean;
 };
 
 const DocumentsUploadForm: React.FC<DocumentsUploadFormProps> = ({
   onSubmit,
   onBack,
+  isSubmitting = false,
 }) => {
   const [documents, setDocuments] = useState<Documents>({
     offerLetter: null,
@@ -44,6 +47,7 @@ const DocumentsUploadForm: React.FC<DocumentsUploadFormProps> = ({
             type="file"
             accept=".pdf,.doc,.docx"
             onChange={(e) => handleFileChange(e, "offerLetter")}
+            disabled={isSubmitting}
           />
           <p className="text-xs text-gray-500">
             Upload PDF or Word document (Max 2MB)
@@ -58,6 +62,7 @@ const DocumentsUploadForm: React.FC<DocumentsUploadFormProps> = ({
             type="file"
             accept=".pdf,.doc,.docx"
             onChange={(e) => handleFileChange(e, "nocByHod")}
+            disabled={isSubmitting}
           />
           <p className="text-xs text-gray-500">
             Upload PDF or Word document (Max 2MB)
@@ -72,6 +77,7 @@ const DocumentsUploadForm: React.FC<DocumentsUploadFormProps> = ({
             type="file"
             accept=".pdf,.doc,.docx"
             onChange={(e) => handleFileChange(e, "studentLetterToHod")}
+            disabled={isSubmitting}
           />
           <p className="text-xs text-gray-500">
             Upload PDF or Word document (Max 2MB)
@@ -80,10 +86,19 @@ const DocumentsUploadForm: React.FC<DocumentsUploadFormProps> = ({
       </div>
 
       <div className="flex justify-between">
-        <Button type="button" variant="outline" onClick={onBack}>
+        <Button type="button" variant="outline" onClick={onBack} disabled={isSubmitting}>
           Previous
         </Button>
-        <Button type="submit">Submit Application</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Submitting...
+            </>
+          ) : (
+            "Submit Application"
+          )}
+        </Button>
       </div>
     </form>
   );
