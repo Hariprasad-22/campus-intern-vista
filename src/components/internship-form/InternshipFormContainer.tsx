@@ -99,10 +99,10 @@ const InternshipFormContainer: React.FC = () => {
         );
       }
 
-      // Save application data to Supabase - Fix the insert operation
+      // Save application data to Supabase - use the correct column names from database schema
       const { data, error } = await supabase
         .from('internship_applications')
-        .insert({
+        .insert([{  // Note: Supabase expects an array of objects here
           student_id: user.id,
           full_name: studentInfo.fullName,
           roll_number: studentInfo.rollNumber,
@@ -131,7 +131,7 @@ const InternshipFormContainer: React.FC = () => {
           student_letter_to_hod_path: documentPaths.student_letter_to_hod_path,
           
           status: 'pending'
-        })
+        }])
         .select();
 
       if (error) {
